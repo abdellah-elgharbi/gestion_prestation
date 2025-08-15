@@ -157,7 +157,7 @@ public class HistoriquePeseesController {
     public ResponseEntity<?> deleteHistoriquePesee(@PathVariable Integer id) {
         try {
             historiquePeseesService.deleteHistoriquePesee(id);
-            return ResponseEntity.ok(Map.of("message", "Historique de pesée supprimé avec succès"));
+            return ResponseEntity.ok(Map.of("suppretion", true));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {

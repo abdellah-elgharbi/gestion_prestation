@@ -5,6 +5,7 @@ import com.marsa_maroc.gestion_des_prestation.entities.Prestation;
 import com.marsa_maroc.gestion_des_prestation.enums.Statut;
 import com.marsa_maroc.gestion_des_prestation.enums.TypeOperation;
 import com.marsa_maroc.gestion_des_prestation.exeptions.ResourceNotFoundException;
+import com.marsa_maroc.gestion_des_prestation.respositories.HistoriquePeseesRepository;
 import com.marsa_maroc.gestion_des_prestation.respositories.PrestationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.List;
 public class PrestationService {
 
     private final PrestationRepository prestationRepository;
-
+    private final HistoriquePeseesRepository historiquePeseesRepository;
     @Transactional(readOnly = true)
     public List<Prestation> getAllPrestations() {
         return prestationRepository.findAll();
@@ -89,7 +90,16 @@ public class PrestationService {
     }
 
     public void deletePrestation(String numeroPrestation) {
+        int deletedCount = historiquePeseesRepository.deleteByPrestationNumeroPrestation(numeroPrestation);
+        System.out.println(deletedCount + " pesées supprimées.");
+
         Prestation prestation = getPrestationById(numeroPrestation);
+        if (prestation == null) {
+            throw new IllegalArgumentException("Prestation avec le numéro " + numeroPrestation + " introuvable.");
+        }
+
         prestationRepository.delete(prestation);
     }
+
+
 }

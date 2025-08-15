@@ -18,32 +18,33 @@ import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
+
     private final RsaConfig rsaConfig;
 
-    public SecurityConfig( RsaConfig rsaConfig) {
-
+    public SecurityConfig(RsaConfig rsaConfig) {
         this.rsaConfig = rsaConfig;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       return  http
+        return http
                 .csrf(csrf -> csrf.disable())
-               .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/**").permitAll()
-                        .anyRequest().permitAll()) // autoriser toutes les requêtes
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // autorise uniquement le preflight CORS
+                        .anyRequest().authenticated() // tout le reste nécessite un JWT
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable()).sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults())).build();
-        
-
+                .httpBasic(basic -> basic.disable())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -53,10 +54,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     JwtDecoder jwtDecoder() throws Exception {
         RSAPublicKey publicKey = rsaConfig.getPublicKey();
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 }
-

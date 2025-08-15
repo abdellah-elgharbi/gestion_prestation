@@ -54,13 +54,13 @@ public class Prestation {
     private LocalDate dateDepart;
 
     @Column(name = "bulletin_prestation")
-    private String bulletinPrestation;
+    private String bulletinPrestation="*";
 
     @Column(name = "type_marchandise")
-    private String typeMarchandise;
+    private String typeMarchandise="*";
 
     @Column(name = "connaissement")
-    private String connaissement;
+    private String connaissement ="*";
 
     @Column(name= "poisRestent")
     private BigDecimal poisRestent;

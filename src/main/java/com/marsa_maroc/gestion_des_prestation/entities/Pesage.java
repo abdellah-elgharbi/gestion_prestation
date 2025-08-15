@@ -1,6 +1,8 @@
 package com.marsa_maroc.gestion_des_prestation.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.marsa_maroc.gestion_des_prestation.enums.TypePesage;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,7 +23,8 @@ public class Pesage {
     private Integer idPesage;
 
     @ManyToOne
-    @JoinColumn(name = "prestation_id", nullable = false)
+    @JoinColumn(name = "prestation_id")
+    @JsonManagedReference
     private Prestation prestation;
 
     @ManyToOne
